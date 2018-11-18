@@ -3,6 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const stream = require('stream')
 const chalk = require('chalk')
+const db = require('./db/index')
 
 let start = Date.now()
 qiancheng.getJobs().then(jobs => {
@@ -21,4 +22,7 @@ qiancheng.getJobs().then(jobs => {
     let end = Date.now()
     console.log(chalk.green(`用时${(end - start)/1000}S`))
   })
+
+  // 存入数据库
+  db.insertJobs(jobs).then(db.close)
 })

@@ -22,7 +22,7 @@ function getHtml(url){
 async function getJobs(city){
   // 暂时固定入口列表页为广州， city参数不适用先
   //const indexPage = 'https://search.51job.com/list/030200,000000,0000,00,9,99,%2520,2,1.html?lang=c&stype=&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=99&companysize=99&providesalary=99&lonlat=0%2C0&radius=-1&ord_field=0&confirmdate=9&fromType=&dibiaoid=0&address=&line=&specialarea=00&from=&welfare='
-  const indexPage = 'https://search.5122job.com'
+  const indexPage = 'https://search.51job.com'
   let pages = [],
     jobs = [],
     currentPage = 0, // 当前正在加载和处理的页码
@@ -49,10 +49,10 @@ async function getJobs(city){
     } catch (error) {
       // 获取html 失败
       // 获取下一页面
-      console.log(`获取第${currentPage + 1}页数据失败`)
+      console.log(`获取第${currentPage + 1}页数据失败 error:${error}`)
     }
     console.log('抓取第',currentPage, '页')
-    if(currentPage >= pages.length - 1 || (currentPage >= 10)){
+    if(currentPage >= pages.length - 1 || (currentPage >= 100)){
       // 获取完成
       return jobs
     }

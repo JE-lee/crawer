@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "qiancheng": "node ./src/index.js",
-    "test_queue": "node ./test/queue.js"
+    "test_queue": "node ./test/queue.js",
+    "mongodb": "node ./src/db/index.js"
   },
   "keywords": [
     "crawler"
@@ -18,6 +19,7 @@
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
     "iconv-lite": "^0.4.24",
+    "mongodb": "^2.2.36",
     "request": "^2.88.0"
   }
 }
