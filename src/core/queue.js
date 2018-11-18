@@ -5,11 +5,10 @@ const chalk = require('chalk')
 class AsyncQueue{
   constructor(generator){
     if(typeof generator != 'function'){
-      console.log(chalk.red('请绑定返回一个promise的异步函数'))
+      console.error(chalk.red('请绑定返回一个promise的异步函数'))
       return 
     }
-    // 返回Promise对象的异步函数
-    this.asyncGenerator = null;
+   
     // 每一个Promise fullfill 之后执行的回调函数
     this.stepCallback = null;
     // 待生成promise 的队列
@@ -20,6 +19,7 @@ class AsyncQueue{
     this.currentIndex = -1;
     // 同一时间pending的最大promise数
     this.maxPendingLength = 10;
+    // 返回Promise对象的异步函数
     this.asyncGenerator = generator
   }
   on(event, callback){
@@ -41,29 +41,34 @@ class AsyncQueue{
   }
   _generateFromQueue(){
     let queue = this.queue
-    if(this.currentIndex < queue.length -1 && (this.proCount < this.maxPendingLength)){
+    if(this.currentIndex < queue.length -1 && (this.proCount <= this.maxPendingLength)){
       let argu = queue[++this.currentIndex].data,
         promise = typeof argu != 'undefind' ? this.asyncGenerator(argu) : Promise.reject() // 返回一个promise
       if(!(promise instanceof Promise)) promise = Promise.reject()
       this.proCount ++ 
-      let that = this
       promise.then(res => {
         //queue中去除
         this.proCount--
 
-        if(!this.stepCallback) return res
-        this.stepCallback({
+        if(!this.stepCallback) return
+        this.stepCallback(null,{
           payload: argu,
           result: res
         })
 
-        //queue中还有，继续添加
+        //继续添加
+        this._generateFromQueue()
+      }).catch((err) => {
+        this.proCount --
+
+        if(this.stepCallback){
+          this.stepCallback(err, {})
+        }
         this._generateFromQueue()
       })
     }
 
   }
-  
 }
 
 module.exports = {

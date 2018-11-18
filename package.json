@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "qiancheng": "node ./src/index.js"
+    "qiancheng": "node ./src/index.js",
+    "test_queue": "node ./test/queue.js"
   },
   "keywords": [
     "crawler"
