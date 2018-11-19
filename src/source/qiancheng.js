@@ -2,7 +2,7 @@
  * 爬取前程无忧某个地区的职位信息
  */
 
-const get = require('./get')
+const get = require('../core/get')
 const cheerio = require('cheerio')
 const job = require('./job')
 

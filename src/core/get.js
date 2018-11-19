@@ -18,8 +18,6 @@ function getPageHtml(url, textCoding = 'utf8'){
       //Todo, 关闭流
     })
   })
-  
-  
 }
 
 module.exports = {
