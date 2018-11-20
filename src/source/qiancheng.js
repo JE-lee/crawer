@@ -100,8 +100,6 @@ function getAndHandlePage(pageUrl, jobs = [], pages = []){
   })
 }
 
-
-
 module.exports = {
   getHtml,
   getJobs

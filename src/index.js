@@ -4,7 +4,9 @@ const path = require('path')
 const stream = require('stream')
 const chalk = require('chalk')
 const db = require('./db/index')
+const Search = require('./source/qiancheng/search')
 
+/*
 let start = Date.now()
 qiancheng.getJobs().then(jobs => {
   // 写入文件
@@ -25,4 +27,18 @@ qiancheng.getJobs().then(jobs => {
 
   // 存入数据库
   db.insertJobs(jobs).then(db.close)
+})*/
+
+let start = Date.now()
+let search = new Search('前端', (err, count) => {
+  console.log(`抓取第${count}列表页`)
+  return count < 100
 })
+
+search.on('finish',jobs => {
+  let end = Date.now()
+  console.log(chalk.green(`共抓取${jobs.length}条职位数据，用时${(end - start)/1000}S`))
+  // 存入数据库
+  db.insertJobs(jobs).then(db.close)
+})
+

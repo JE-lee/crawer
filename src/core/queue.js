@@ -24,7 +24,7 @@ class AsyncQueue{
     this.queue.push(generator)
     // 如果promiseQueue 未满，则压入
     if(this.proCount < this.maxPendingLength){
-      this._generateFromQueue()
+      Promise.resolve().then(() => { this._generateFromQueue() })
     }
   }
   _generateFromQueue(){
@@ -39,12 +39,19 @@ class AsyncQueue{
         this.proCount--
         //继续添加
         this._generateFromQueue()
+        if(this.currentIndex >= queue.length -1){
+          this.emptyCallback && this.emptyCallback()
+        }
       }).catch(() => {
         this.proCount --
         this._generateFromQueue()
       })
     }
-
+  }
+  on(event, callback){
+    if(event == 'zero'){
+      this.emptyCallback = callback
+    }
   }
 }
 

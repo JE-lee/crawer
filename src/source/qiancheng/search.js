@@ -1,16 +1,17 @@
 
-//const queue = require('../../core/queue')
+const queue = require('../../core/queue')
 const get = require('../../core/get')
-const cheerio = require('cheerio')
-const job = require('../job')
-//let asyncQueue = new queue.asyncQueue()
+const parse = require('./parse')
+const chalk = require('chalk')
+
+let asyncQueue =new  queue.AsyncQueue(20)
 
 module.exports = class Search{
   /**
-     * 
-     * @param {String} key 
-     * @param {Function} limit  // 接收三个参数 (err, listPagecount, html)
-     */
+   * 
+   * @param {String} key 
+   * @param {Function} limit  // 接收三个参数 (err, listPagecount, html)
+   */
   constructor(key, limit){
     this.searchKey = key
     this.limit = limit
@@ -40,34 +41,14 @@ module.exports = class Search{
    * 前程无忧的招聘信息的url都在底部的分页上面
    */
   static getHtml(url){
-    return get.getPageHtml(url, 'gbk')
-  }
-  /**
-   * 
-   * @param {String} pageUrl 
-   * @param {Array} jobs 
-   * @param {Array} pages 
-   */
-  static handleListpage(html){
-    let jobs = []
-    // 当前页面的列表数据
-    let $ = cheerio.load(html),
-      cells = $('.el', '#resultList')
-
-    for(let i = 1, length = cells.length;i< length; i++){
-      let cell = cells.eq(i),
-        $title = $('.t1 a', cell),
-        title = $title.attr('title').trim(),
-        detailLink = $title.attr('href').trim(),
-        $company = $('.t2 a', cell),
-        company = $company.attr('title').trim(),
-        companyLink = $company.attr('href').trim(),
-        region = $('.t3', cell).text().trim(),
-        pay = $('.t4', cell).text().trim(),
-        time = $('.t5', cell).text().trim()
-      jobs.push(job.createJob({ title, company, region, pay, time, detailLink, companyLink}))
+    let promise 
+    try {
+      promise = get.getPageHtml(url, 'gbk')
+    } catch (error) {
+      console.log(chalk.red(error))
+      promise = Promise.resolve('')
     }
-    return jobs
+    return promise
   }
   async getListpage(){
     let jobs = []
@@ -75,7 +56,7 @@ module.exports = class Search{
     while(1){
       let url = Search.generateUrl(this.searchKey, 1),
         html = await Search.getHtml(url),
-        pageJob = Search.handleListpage(html)
+        pageJob = parse.parseListpage(html)
       jobs = jobs.concat(pageJob)
       this.pageCount ++
       if (this.limit){
@@ -86,8 +67,24 @@ module.exports = class Search{
     }
     return jobs
   }
+  getDetailpage(jobs){
+    jobs.forEach(job => {
+      asyncQueue.push(async () => {
+        let html = await Search.getHtml(job.detailLink)
+        let detail = parse.parseDetailpage(html)
+        job.detail = detail
+        console.log(chalk.green(`抓取${job.title}完成`))
+      })
+    })
+    return new Promise((resolve, reject) => {
+      asyncQueue.on('zero', () => {
+        resolve(jobs)
+      })
+    })
+  }
   async search(){
     let jobs = await this.getListpage()
+    jobs = await this.getDetailpage(jobs)
     this.finishCb && this.finishCb(jobs)
   }
   on(event, callback){
