@@ -31,11 +31,11 @@ module.exports = {
     return jobs
   },
   parseDetailpage: function(html){
-    let detail = {}
-    let $ = cheerio.load(html)
-
-    let jobinfo = $('.job_msg').text().trim()
-    jobinfo = jobinfo.substr(0, jobinfo.lastIndexOf('职能类别')).trim()
+    let detail = {},
+      $ = cheerio.load(html),
+      jobinfo = $('.job_msg').text().trim(),
+      index = jobinfo.lastIndexOf('职能类别')
+    jobinfo = jobinfo.substr(0, index == -1 ? 0 : index ).trim()
     detail.jobinfo = jobinfo
     return detail
   }

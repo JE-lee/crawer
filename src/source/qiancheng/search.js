@@ -17,7 +17,6 @@ module.exports = class Search{
     this.limit = limit
     this.pageCount = 0 // 已经爬取的页面数量
     this.finish = false
-    this.search()
   }
   /**
   * 
@@ -50,6 +49,10 @@ module.exports = class Search{
     }
     return promise
   }
+  // 返回一个promise
+  start(){
+    return this._search()
+  }
   async getListpage(){
     let jobs = []
     const defaultCount = 100
@@ -76,22 +79,16 @@ module.exports = class Search{
         console.log(chalk.green(`抓取${job.title}完成`))
       })
     })
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       asyncQueue.on('zero', () => {
         resolve(jobs)
       })
     })
   }
-  async search(){
+  async _search(){
     let jobs = await this.getListpage()
     jobs = await this.getDetailpage(jobs)
-    this.finishCb && this.finishCb(jobs)
+    return jobs
   }
-  on(event, callback){
-    if('finish' == event){
-      this.finishCb = callback
-    }
-  }
-  
 }
 
