@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "qiancheng": "node ./src/index.js",
     "test_queue": "./node_modules/.bin/mocha ./test/core/queue.js",
+    "test_qiancheng": "./node_modules/.bin/mocha ./test/qiancheng/search.js",
     "mongodb": "node ./src/db/index.js",
     "eslint": "./node_modules/.bin/eslint . --fix"
   },

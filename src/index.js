@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const stream = require('stream')
 const chalk = require('chalk')
-const db = require('./db/index')
+//const db = require('./db/index')
 const Search = require('./source/qiancheng/search')
 
 /*
@@ -26,14 +26,15 @@ qiancheng.getJobs().then(jobs => {
   })
 
   // 存入数据库
-  db.insertJobs(jobs).then(db.close)
+  //db.insertJobs(jobs).then(db.close)
 })*/
+
 
 let start = Date.now()
 let search = new Search('前端', (err, count) => {
-  console.log(`抓取第${count}列表页`)
-  return count < 100
+  return false
 })
+
 
 search.on('finish',jobs => {
   let end = Date.now()

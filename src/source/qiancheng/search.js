@@ -3,6 +3,7 @@ const queue = require('../../core/queue')
 const get = require('../../core/get')
 const parse = require('./parse')
 const chalk = require('chalk')
+const uuidv1 = require('uuid/v1')
 
 let asyncQueue =new  queue.AsyncQueue(20)
 
@@ -71,19 +72,23 @@ module.exports = class Search{
     return jobs
   }
   getDetailpage(jobs){
+    let gps = []
     jobs.forEach(job => {
-      asyncQueue.push(async () => {
+      gps.push(async () => {
         let html = await Search.getHtml(job.detailLink)
         let detail = parse.parseDetailpage(html)
         job.detail = detail
-        console.log(chalk.green(`抓取${job.title}完成`))
+        //console.log(chalk.green(`抓取${job.title}完成`))
       })
     })
-    return new Promise((resolve) => {
-      asyncQueue.on('zero', () => {
-        resolve(jobs)
-      })
-    })
+
+    return jobs.length ? new Promise((resolve) => {
+      let namespace = uuidv1()
+      asyncQueue.push(gps, namespace)
+        .on(`zero:${namespace}`, () => {
+          resolve(jobs)
+        })
+    }) : []
   }
   async _search(){
     let jobs = await this.getListpage()

@@ -33,6 +33,7 @@ class AsyncQueue{
   /**
    * 
    * @param {Function} generator | 异步函数，要求返回一个promise
+   * note: 压入空数组将不会触发 zero事件
    */
   push(generators, namespace){
     if(!(generators instanceof Array)) return 
